@@ -1,0 +1,18 @@
+.old-game-list li {
+  margin-bottom: 15px;
+}
+.old-game-list li .game-text {
+  display: inline-block;
+  width: 55%;
+}
+.game-controls #guessed-letters {
+  display: flex;
+}
+.game-controls #guessed-letters .letter {
+  display: inline-block;
+  flex-grow: 1;
+  text-align: center;
+  font-size: 20px;
+  background-color: #ccc;
+  box-shadow: 0px 0px 11px  #000 inset;
+}

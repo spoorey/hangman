@@ -1,37 +1,106 @@
+.old-game-list li {
+  margin-bottom: 15px;
+}
+.old-game-list li .game-text {
+  display: inline-block;
+  width: 55%;
+}
+.game-controls #guessed-letters {
+  display: flex;
+}
+.game-controls #guessed-letters .letter {
+  display: inline-block;
+  flex-grow: 1;
+  text-align: center;
+  font-size: 20px;
+  background-color: #ccc;
+  box-shadow: 0px 0px 11px  #000 inset;
+}
+@media (min-width: 1200px) {
+  .game-controls #guessed-letters .letter {
+    background-color: red;
+  }
+}
+.word-list-container {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.word-list-container .subtitle {
+  font-size: 50px;
+  padding: 10px 30px;
+  font-weight: bold;
+  border-radius: 5px;
+  margin-right: 100%;
+  margin-left: 10px;
+}
+.word-list-container .entry {
+  display: inline-block;
+  min-width: 210px;
+  height: 140px;
+  margin: 10px;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  background-color: #eeeeee;
+  vertical-align: middle;
+  padding: 15px;
+  overflow: hidden;
+  transition: padding 0.5s ease-in-out, background-color 0.5s ease-in-out, box-shadow 0.5s ease-in-out, border-radius 0.5s ease-in-out;
+  flex-grow: 1;
+}
+.word-list-container .entry .word {
+  height: 90px;
+  font-size: 18px;
+  margin-bottom: 10px;
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+}
+.word-list-container .entry .slide-down {
+  display: none;
+  text-align: right;
+}
+.word-list-container .entry .slide-down .modification-times {
+  color: #000000;
+}
+.word-list-container .entry .slide-down .links {
+  margin-top: 14px;
+}
+.word-list-container .entry.down {
+  /*background-color: @active-background-color;
+        color: @active-color;*/
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: #4d4d4d 0 0 20px inset;
+}
+.word-list-container .entry.down .modification-times {
+  color: #000000;
+}
+.error-404 {
+  text-align: center;
+  background-color: #222222;
+  color: #ccffcc;
+  width: 50%;
+  margin: 0 auto;
+  padding: 60px 30px;
+  box-shadow: 0px 0px 20px 10px inset;
+  border-radius: 200px;
+  font-size: 20px;
+}
+.error-404 .header-404 h1 {
+  font-size: 100px;
+  font-family: Tahoma, Arial, Helvetica, sans-serif;
+}
+.error-404 .reason-404 {
+  color: #080808;
+  background-color: #99ff99;
+  box-shadow: #99ff99 0px 0px 16px 0px;
+  width: 80%;
+  margin: 0 auto;
+  border-radius: 10px;
+  padding: 10px;
+}
 body {
-    padding-top: 60px;
-    padding-bottom: 40px;
-}
-
-.zf-green {
-    color: #68b604;
-}
-
-.btn-success {
-  background-color: #57a900;
-  background-image: -moz-linear-gradient(top, #70d900, #57a900);
-  background-image: -ms-linear-gradient(top, #70d900, #57a900);
-  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#70d900), to(#57a900));
-  background-image: -webkit-linear-gradient(top, #70d900, #57a900);
-  background-image: -o-linear-gradient(top, #70d900, #57a900);
-  background-image: linear-gradient(top, #70d900, #57a900);
-  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#70d900', endColorstr='#57a900', GradientType=0);
-}
-
-.btn-success:hover,
-.btn-success:active,
-.btn-success.active,
-.btn-success.disabled,
-.btn-success[disabled] {
-  background-color: #57a900;
-}
-
-.btn-success:active, .btn-success.active {
-  background-color: #57a900;
-}
-
-div.container a.brand {
-    background: url("../img/zf2-logo.png") no-repeat scroll 0 10px transparent;
-    margin-left: 0;
-    padding: 8px 20px 12px 40px;
+  padding: 80px;
+  margin-bottom: 0;
 }

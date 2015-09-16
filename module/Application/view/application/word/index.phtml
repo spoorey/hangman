@@ -1,0 +1,115 @@
+<h1>Viele Wörter</h1>
+<?php
+/** @var \Application\Entity\Word[] $words */
+$words = $this->words;
+
+/** @var int $pageCount amount of pages */
+$pageCount = $this->pageCount;
+$currentPage = $this->currentPage;
+
+?>
+<nav class="word-list">
+    <ul class="pagination">
+        <li <?php if ($currentPage <= 1): ?>class="disabled"<?php endif; ?>>
+            <a
+                href="<?php if ($currentPage > 1) { echo $this->url('application/words', [], ['query' => ['p' => $currentPage - 1]]); } ?>#"
+                aria-label="Previous"
+            >
+                <span aria-hidden="true">&laquo;</span>
+            </a>
+        </li>
+        <?php for ($i = 1; $i <= $pageCount; $i ++): ?>
+            <li <?php if ($currentPage == $i): ?> class="active" <?php endif; ?>>
+                <a href="<?php echo $this->url('application/words', [], ['query' => ['p' => $i]]); ?>" >
+                    <?php echo $i; ?>
+                </a>
+            </li>
+        <?php endfor; ?>
+        <li <?php if ($currentPage >= $pageCount): ?>class="disabled"<?php endif; ?>>
+                <a
+                    href="<?php if ($currentPage  < $pageCount) { echo $this->url('application/words', [], ['query' => ['p' => $currentPage + 1]]); } ?>#"
+                    aria-label="Next"
+                >
+                <span aria-hidden="true">&raquo;</span>
+            </a>
+        </li>
+    </ul>
+</nav>
+<div class="word-list-container">
+<?php
+$lastFirstLetter = null;
+foreach ($words as $word):
+
+    $firstLetter = $word->getFirstLetter();
+    if ($firstLetter != $lastFirstLetter):
+        $lastFirstLetter = $firstLetter;
+    ?>
+        <div class="subtitle bg-primary">
+            <?php echo $firstLetter; ?>
+        </div>
+    <?php
+    endif;
+?>
+
+        <div class="entry">
+            <div class="word">
+                <?php echo $word->getWord(); ?>
+            </div>
+            <div class="slide-down">
+                <span class="modification-times">
+                    <?php
+                    ?>
+                    <small>
+                        Hinzugefügt: <abbr title="<?php echo $word->getCreatedAt()->format('d.m.Y H:i'); ?>"><?php echo $this->timeAgo($word->getCreatedAt()); ?></abbr>
+                    </small>
+                    <br>
+                    <small>
+                        Zuletzt bearbeitet: <abbr title="<?php echo $word->getCreatedAt()->format('d.m.Y H:i'); ?>"><?php echo $this->timeAgo($word->getUpdatedAt()); ?></abbr>
+                    </small>
+                </span>
+
+                <div class="links">
+                    <div class="btn-group">
+                    <a class="btn btn-primary btn-xs" href="<?php echo $this->url('application/words', [ 'action' => 'edit', 'id' => $word->getId(),], []); ?>">
+                        <i class="fa fa-edit"></i> Bearbeiten
+                    </a>
+                    <a class="btn btn-danger btn-xs">
+                        <i class="fa fa-trash-o"></i> Löschen
+                    </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+<?php
+endforeach;
+?>
+</div>
+<nav class="word-list">
+    <ul class="pagination">
+        <li <?php if ($currentPage <= 1): ?>class="disabled"<?php endif; ?>>
+            <a
+                href="<?php if ($currentPage > 1) { echo $this->url('application/words', [], ['query' => ['p' => $currentPage - 1]]); } ?>#"
+                aria-label="Previous"
+                >
+                <span aria-hidden="true">&laquo;</span>
+            </a>
+        </li>
+        <?php for ($i = 1; $i <= $pageCount; $i ++): ?>
+            <li <?php if ($currentPage == $i): ?> class="active" <?php endif; ?>>
+                <a href="<?php echo $this->url('application/words', [], ['query' => ['p' => $i]]); ?>" >
+                    <?php echo $i; ?>
+                </a>
+            </li>
+        <?php endfor; ?>
+        <li <?php if ($currentPage >= $pageCount): ?>class="disabled"<?php endif; ?>>
+            <a
+                href="<?php if ($currentPage  < $pageCount) { echo $this->url('application/words', [], ['query' => ['p' => $currentPage + 1]]); } ?>#"
+                aria-label="Next"
+                >
+                <span aria-hidden="true">&raquo;</span>
+            </a>
+        </li>
+    </ul>
+</nav>
+<?php echo $this->headScript()
+        ->prependFile($this->basePath('js/application/word.js'));

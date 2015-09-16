@@ -1,0 +1,52 @@
+<div class="jumbotron">
+    <h2></h2>
+    <p>
+        <?php
+        $gameCount = $this->gameCount;
+        if ($gameCount >= 1):
+        ?>
+            <?php if ($gameCount == 1): ?>
+                <h2>Du hast noch ein nicht beendetes Spiel: </h2>
+            <?php else: ?>
+                <h2>Du hast noch <?php echo $gameCount; ?> nicht beendete Spiele: </h2>
+            <?php endif;?>
+        <ul class="old-game-list">
+        <?php
+        /** @var \Application\Entity\Game $game */
+            foreach ($this->oldGames as $game):
+            ?>
+            <li>
+
+                <span class="game-text">
+                    Letzte Aktion: <abbr title="<?php echo $game->getLastActionAt()->format('d.m.Y H:i'); ?>"><?php echo $this->timeAgo($game->getLastActionAt()); ?></abbr>
+                    Bereits geratene Buchstaben: <?php echo count($game->getGuessedLetters()); ?>
+                </span>
+                    <a
+                        href="<?php echo $this->url('application/default', ['controller' => 'game', 'action' => 'start', 'id' => $game->getId()]); ?>"
+                        class="btn btn-sm btn-success"
+                    >
+                        <i class="fa fa-play"></i> Weiterspielen
+                    </a>
+            </li>
+            <?php
+            endforeach;
+        else:
+        ?>
+            <h2>Derzeit läuft noch kein Spiel</h2>
+        <?php
+        endif;
+        ?>
+        <?php $difference = $gameCount  - count($this->oldGames); ?>
+        <?php if ($difference >= 1): ?>
+            ... <?php echo $difference; ?> Spiele werden nciht einmal Dargestellt! Schliess diese Spiele zuerst ab, bevor du ein neues beginnst.
+        <?php else: ?>
+            <a
+                href="<?php echo $this->url('application/default', ['controller' => 'game', 'action' => 'start']); ?>"
+                class="btn btn-lg btn-success"
+                >
+                <i class="fa fa-plus-circle"></i> <i class="fa fa-play"></i> Neues Spiel
+            </a>
+        <?php endif; ?>
+        </ul>
+    </p>
+</div>

@@ -1,0 +1,15 @@
+<div class="col-xs-12 col-sm-6">
+    <?php
+    /** @var \Application\Form\WordForm $form */
+    $form = $this->form;
+    ?>
+    <?php if ($this->conflict): ?>
+        <div class="alert alert-danger">
+            Dieses Wort gibt es bereits.
+        </div>
+    <?php endif; ?>
+    <?php echo $this->form()->openTag($form); ?>
+    <?php echo $this->btFormRow($form->get('word')); ?>
+    <?php echo $this->btFormRow($form->get('submit')); ?>
+    <?php echo $this->form()->closeTag(); ?>
+</div>

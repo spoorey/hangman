@@ -1,0 +1,9 @@
+<div class="game-controls">
+    <div id="guessed-letters"></div>
+    <div id="letter-count"></div>
+
+    <a href="" class="btn btn-warning" id="pause-game"><i class="fa fa-pause"></i> Spiel unterbrechen</a>
+    <a href="" class="btn btn-danger" id="pause-game"><i class="fa fa-flag"></i> Spiel aufgeben</a>
+</div>
+<?php echo $this->headScript()
+    ->prependFile($this->basePath('js/application/game.js'));

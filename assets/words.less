@@ -1,0 +1,110 @@
+
+.word-list-container {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+
+    .subtitle {
+        font-size: 50px;
+        padding: 10px 30px;
+        font-weight: bold;
+        border-radius: 5px;
+        margin-right: 100%;
+        margin-left: @word-margin;
+    }
+}
+
+@word-entry-width: 210px;
+@word-entry-height: 140px;
+@word-entry-padding: 15px;
+.word-list-container .entry {
+    display: inline-block;
+    min-width: @word-entry-width;
+    height: @word-entry-height;
+    margin: @word-margin;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    background-color: @light-grey;
+    vertical-align: middle;
+    padding: @word-entry-padding;
+    overflow: hidden;
+    transition:
+    padding 0.5s ease-in-out,
+    background-color 0.5s ease-in-out,
+    box-shadow 0.5s ease-in-out,
+    border-radius 0.5s ease-in-out
+;
+    flex-grow: 1;
+
+    .word {
+        height: @word-entry-height - @word-entry-padding * 2 - @word-margin * 2;
+        font-size: 18px;
+        margin-bottom: @word-margin;
+        margin-top: @word-margin;
+        display: flex;
+        align-items: center;
+    }
+
+    .slide-down {
+        display: none;
+        text-align: right;
+
+        .modification-times {
+            color: @black;
+        }
+
+        .links {
+            margin-top: @line-height;
+        }
+
+    }
+
+
+
+
+    @active-color: @black;
+    @active-background-color: #666;
+    &.down {
+        /*background-color: @active-background-color;
+        color: @active-color;*/
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: lighten(@black, 30%) 0 0 20px inset;
+
+        .word {
+        }
+
+        .modification-times {
+            color: @active-color;
+        }
+    }
+}
+
+.error-404 {
+    text-align: center;
+    background-color: @bg-404;
+    color: @color-404;
+    width: 50%;
+    margin: 0 auto;
+    padding: 60px 30px;
+    box-shadow: 0px 0px 20px 10px inset;
+    border-radius: 200px;
+    font-size: 20px;
+
+    .header-404 {
+        h1 {
+            font-size: 100px;
+            font-family: Tahoma, Arial, Helvetica, sans-serif;
+        }
+    }
+
+    .reason-404 {
+        color: darken(@bg-404, 10%);
+        background-color: darken(@color-404, 10%);
+        box-shadow: darken(@color-404, 10%) 0px 0px 16px 0px;
+        width: 80%;
+        margin: 0 auto;
+        border-radius: 10px;
+        padding: 10px;
+    }
+}

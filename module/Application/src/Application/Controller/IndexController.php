@@ -9,13 +9,20 @@
 
 namespace Application\Controller;
 
+use Application\Entity\Word;
+use DoctrineModule\Persistence\ObjectManagerAwareInterface;
+use DoctrineModule\Persistence\ProvidesObjectManager;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
 
-class IndexController extends AbstractActionController
+class IndexController extends AbstractActionController implements ObjectManagerAwareInterface
 {
+    use ProvidesObjectManager;
+
     public function indexAction()
     {
-        return new ViewModel();
+        $viewModel = new ViewModel();
+        $viewModel->setTemplate('application/index/index-notloggedin');
+        return $viewModel;
     }
 }
