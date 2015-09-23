@@ -22,7 +22,12 @@ class IndexController extends AbstractActionController implements ObjectManagerA
     public function indexAction()
     {
         $viewModel = new ViewModel();
-        $viewModel->setTemplate('application/index/index-notloggedin');
+        $auth = $this->getServiceLocator()->get('auth');
+        if ($auth->hasIdentity()) {
+            $viewModel->setTemplate('application/index/index');
+        } else {
+            $viewModel->setTemplate('application/index/index-notloggedin');
+        }
         return $viewModel;
     }
 }

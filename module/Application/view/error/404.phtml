@@ -2,9 +2,11 @@
     <div class="header-404">
         <h1>404</h1>
         <h2>Hier ist nichts</h2>
+        <small>(ausser dieser Nachricht)</small>
     </div>
     <?php if (isset($this->reason) && $this->reason): ?>
-     <p class="reason-404">
+        <!--
+    <p class="reason-404">
         <?php
         $reasonMessage = '';
         switch ($this->reason) {
@@ -30,8 +32,8 @@
         }
         ?>
 
-        <?php echo $reasonMessage ?>
-        </p>
+        <?php // echo $reasonMessage ?>
+    </p> -->
 
     <?php endif ?>
 
@@ -74,6 +76,7 @@
                 </dd>
             </dl>
             <?php
+            /*
             $e = $this->exception->getPrevious();
             $icount = 0;
             if ($e) :
@@ -110,7 +113,7 @@
                     endwhile;
                     ?>
                 </ul>
-            <?php endif; ?>
+            <?php endif;*/ ?>
 
         <?php endif ?>
 

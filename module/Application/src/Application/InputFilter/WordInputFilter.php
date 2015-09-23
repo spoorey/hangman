@@ -9,6 +9,7 @@
 namespace Application\InputFilter;
 
 
+use Application\Validator\AllowedCharacters;
 use Zend\Filter\StringToUpper;
 use Zend\InputFilter\InputFilter;
 
@@ -38,6 +39,12 @@ class WordInputFilter extends InputFilter
                         'max'      => 100,
                     ],
                 ],
+                [
+                'name'    => AllowedCharacters::class,
+                'options' => [
+                    'allowedCharacters' => $allowedLetters,
+                ],
+            ],
             ],
         ]);
     }

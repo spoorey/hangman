@@ -35,6 +35,44 @@
   line-height: 13px;
   background-color: #d9534f;
 }
+.game-controls #allowed-letters {
+  display: flex;
+  flex-wrap: wrap;
+  margin-top: 50px;
+  margin-bottom: 50px;
+  justify-content: center;
+  align-content: space-around;
+}
+.game-controls #allowed-letters .letter {
+  cursor: pointer;
+  display: inline-block;
+  flex-grow: 1;
+  text-align: center;
+  min-width: 14.28571429%;
+  max-width: 14.28571429%;
+  height: 25px;
+  font-size: 20px;
+  background-color: #eeeeee;
+  box-shadow: 0px 0px 11px  #000 inset;
+  margin-top: 5px;
+  margin-left: 2%;
+}
+.game-controls #allowed-letters .letter.guessed {
+  background-color: #bbbbbb;
+  cursor: default;
+}
+.game-controls #game-won,
+.game-controls #game-lost {
+  display: none;
+}
+.game-controls #image-container {
+  text-align: center;
+  margin-bottom: 30px;
+}
+.game-controls #image-container img {
+  width: 200px;
+  background-color: #EBF7FF;
+}
 .word-list-container {
   display: flex;
   align-items: center;

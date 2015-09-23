@@ -1,8 +1,27 @@
 <div class="game-controls">
+    <div id="game-won" class="alert alert-success">
+        <strong>Gratulation</strong>
+        Du hast das Wort erraten!<br>
+        Wie gehts weiter?<br>
+        <a href="<?php echo $this->url('application/default', ['controller' => 'index']); ?>" class="btn btn-primary" id="pause-game"><i class="fa fa-home"></i> Zur Übersicht</a>
+        <a href="<?php echo $this->url('application/default', ['controller' => 'game', 'action' => 'start']); ?>" class="btn btn-success"><i class="fa fa-play"></i> Neues Spiel starten</a>
+    </div>
+    <div id="game-lost" class="alert alert-success">
+        <strong>Oh Jeh!</strong>
+        Du konntest das Wort nicht erraten und wurdest gehängt!<br>
+        Wie gehts weiter?<br>
+        <a href="<?php echo $this->url('application/default', ['controller' => 'index']); ?>" class="btn btn-primary" id="pause-game"><i class="fa fa-home"></i> Zur Übersicht</a>
+        <a href="<?php echo $this->url('application/default', ['controller' => 'game', 'action' => 'start']); ?>" class="btn btn-success"><i class="fa fa-play"></i> Neues Spiel starten</a>
+    </div>
+    <div id="image-container">
+        <img src="">
+    </div>
     <div id="guessed-letters"></div>
     <div id="wrong-letters"></div>
-    <a href="<?php echo $this->url('application/default', ['controller' => 'game', 'action' => 'pause']); ?>" class="btn btn-warning" id="pause-game"><i class="fa fa-pause"></i> Spiel unterbrechen</a>
-    <a href="<?php echo $this->url('application/default', ['controller' => 'game', 'action' => 'forfeit']); ?>" class="btn btn-danger" id="pause-game"><i class="fa fa-flag"></i> Spiel aufgeben</a>
+    <div id="allowed-letters"></div>
+    <a href="<?php echo $this->url('application/default', ['controller' => 'game', 'action' => 'pause']); ?>" class="game-abort btn btn-warning" id="pause-game"><i class="fa fa-pause"></i> Spiel unterbrechen</a>
+    <a href="<?php echo $this->url('application/default', ['controller' => 'game', 'action' => 'forfeit']); ?>" class="game-abort btn btn-danger" id="pause-game"><i class="fa fa-flag"></i> Spiel aufgeben</a>
+
 </div>
 <?php echo $this->headScript()
     ->prependFile($this->basePath('js/application/game.js'));

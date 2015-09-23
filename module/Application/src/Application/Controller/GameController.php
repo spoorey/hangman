@@ -25,11 +25,12 @@ class GameController extends AbstractActionController implements ObjectManagerAw
     use ProvidesObjectManager;
 
     public function indexAction() {
+        $user = $this->getUser();
         $gameRepo = $this->getObjectManager()->getRepository(Game::class);
         $container = new Container('game');
         if (isset($container->gameId) && null != $container->gameId) {
             $game = $gameRepo->find($container->gameId);
-            if ($game instanceof Game && $game->getFinishedAt() == null && $game->getUser()->getId() === $this->getUser()->getId()) {
+            if ($game instanceof Game && $game->getFinishedAt() == null && $game->getUser()->getId() === $user->getId()) {
                 return $this->redirect()->toRoute(
                     'application/default',
                     ['controller' => 'game', 'action' => 'play']
@@ -37,9 +38,6 @@ class GameController extends AbstractActionController implements ObjectManagerAw
             }
         }
 
-        $userRepo = $this->getObjectManager()->getRepository(User::class);
-
-        $user = $userRepo->find(1);
         $oldGames = $gameRepo->findBy(
             [
               'user'        => $user->getId(),
@@ -67,17 +65,25 @@ class GameController extends AbstractActionController implements ObjectManagerAw
         $id = (int) $this->params()->fromRoute('id');
         $gameRepo = $this->getObjectManager()->getRepository(Game::class);
 
+        $user = $this->getUser();
+        $startedGames = $gameRepo->findBy([
+            'user' => $user->getId(),
+            'finishedAt' => null,
+        ]);
+
+
         $game = null;
         if (null != $id) {
             $game = $gameRepo->findOneBy([
                 'id'     => $id,
-                'user' => $this->getUser()->getId(),
+                'user' => $user->getId(),
+                'finishedAt' => null,
             ]);
         }
 
         if (!$game instanceof Game) {
             $game = new Game();
-            $game->setUser($this->getUser());
+            $game->setUser($user);
 
 
             $word = Word::getRandomWord($this->getObjectManager());
@@ -85,6 +91,7 @@ class GameController extends AbstractActionController implements ObjectManagerAw
         }
 
         $game->setLastActionAt(new DateTime());
+        $this->getObjectManager()->persist($user);
         $this->getObjectManager()->persist($game);
         $this->getObjectManager()->flush();
 
@@ -109,9 +116,10 @@ class GameController extends AbstractActionController implements ObjectManagerAw
         }
 
         $gameRepo = $this->getObjectManager()->getRepository(Game::class);
+        $user = $this->getUser();
         $game = $gameRepo->findOneBy([
             'id'   => $container->gameId,
-            'user' => $this->getUser()->getId(),
+            'user' => $user->getId(),
         ]);
 
         if (!$game instanceof Game) {
@@ -133,33 +141,78 @@ class GameController extends AbstractActionController implements ObjectManagerAw
         }
 
         $gameRepo = $this->getObjectManager()->getRepository(Game::class);
+        $user = $this->getUser();
         $game = $gameRepo->findOneBy([
             'id'   => $container->gameId,
-            'user' => $this->getUser()->getId(),
+            'user' => $user->getId(),
         ]);
 
         if (!$game instanceof Game) {
             return $this->getResponse()->setStatusCode(404);
         }
+        $correctGuesses = 0;
+        $guessesAndPositions = $game->getGuessesAndPositions();
 
-        $request = $this->getRequest();
-        if ($request->isPost()) {
-            $data = $request->getPost();
-            if (isset($data['letter'])) {
-                $letter = (string) $data['letter'];
-                if(Word::getStringLength($letter) == 1) {
-                    $game->addGuessedLetter($letter);
-                    $this->getObjectManager()->persist($game);
-                    $this->getObjectManager()->flush();
+        foreach ($guessesAndPositions as $guess) {
+            $correctGuesses += count($guess['positions']);
+        }
+        $gameWon =  ($correctGuesses >= $game->getWordLength());
+        // if this game is won, do not update it
+        if (!$gameWon) {
+            $request = $this->getRequest();
+            if ($request->isPost()) {
+                $data = $request->getPost();
+                if (isset($data['letter'])) {
+                    $letter = (string) $data['letter'];
+                    if(Word::getStringLength($letter) == 1) {
+                        $game->addGuessedLetter($letter);
+                    }
                 }
             }
         }
 
+        $config = $this->serviceLocator->get('Config');
+        $allowedLetters = $config['game']['allowedLetters'];
+        $correctGuesses = 0;
         $guessesAndPositions = $game->getGuessesAndPositions();
+
+        foreach ($guessesAndPositions as $guess) {
+            $correctGuesses += count($guess['positions']);
+        }
+
+        $gameWon =  ($correctGuesses >= $game->getWordLength());
+        if ($gameWon) {
+            $container = new Container('game');
+            $container->gameId = null;
+            $game->setWon(true);
+            $game->setFinishedAt(new DateTime());
+        }
+
+        $wrongGuesses = $game->getWrongGuessesAmount();
+        $leftGuesses = $config['game']['maximumGuesses'] - $wrongGuesses;
+
+        $gameLost = $leftGuesses <= 0;
+        if ($gameLost) {
+            $container = new Container('game');
+            $container->gameId = null;
+            $game->setWon(false);
+            $game->setFinishedAt(new DateTime());
+
+            // reveal the word
+            $guessesAndPositions = $game->getLettersAndPositon();
+        }
+
+        $this->getObjectManager()->persist($game);
+        $this->getObjectManager()->flush();
+
         sort($guessesAndPositions);
         $variables = [
             'letterCount'           => $game->getWordLength(),
             'guessedLetters'        => $guessesAndPositions,
+            'allowedLetters'        => $allowedLetters,
+            'gameWon'               => $gameWon,
+            'leftGuesses'           => $leftGuesses,
+            'gameLost'              => $gameLost,
         ];
 
         return new JsonModel($variables);
@@ -176,9 +229,10 @@ class GameController extends AbstractActionController implements ObjectManagerAw
         }
 
         $gameRepo = $this->getObjectManager()->getRepository(Game::class);
+        $user = $this->getUser();
         $game = $gameRepo->findOneBy([
             'id'   => $container->gameId,
-            'user' => $this->getUser()->getId(),
+            'user' => $user->getId(),
         ]);
 
         if (!$game instanceof Game) {
@@ -186,9 +240,10 @@ class GameController extends AbstractActionController implements ObjectManagerAw
         }
 
         $game->setFinishedAt(new DateTime());
+        $game->setWon(false);
         $this->getObjectManager()->persist($game);
         $this->getObjectManager()->flush();
-        $container->getManager()->destroy();
+        $container->gameId = null;
 
         return $this->redirect()->toRoute('application/default', ['controller' => 'game']);
     }
@@ -197,18 +252,22 @@ class GameController extends AbstractActionController implements ObjectManagerAw
         $container = new Container('game');
         if (!(isset($container->gameId) && null != $container->gameId)) {
 
-            return $this->getResponse()->setStatusCode(404);
+            return $this->redirect()->toRoute('application/default', ['controller' => 'game']);
         }
 
-        $container->getManager()->destroy();
+        $container->gameId = null;
         return $this->redirect()->toRoute('application/default', ['controller' => 'game']);
     }
     /**
      * @return User
      */
-    private function getUser(){
-        $userRepo = $this->getObjectManager()->getRepository(User::class);
+    private function getUser() {
+        $user = $this->serviceLocator->get('auth')->getIdentity();
 
-        return $userRepo->find(1);
+        if (!$user instanceof User) {
+            return false;
+        }
+
+        return $this->getObjectManager()->getRepository(User::class)->find($user->getId());
     }
 }

@@ -8,6 +8,12 @@
         <div class="alert alert-warning">
             <strong>Anmeldung Fehlgeschlagen</strong> Bitte Benutzernamen und Passwort prüfen!
         </div>
+    <?php else: ?>
+        <div class="alert alert-info">
+            <strong>Bitte gib deinen Benutzernamen und dein Passwort ein</strong>
+            <br>oder
+            <br> <a href="<?php echo $this->url('application/user', ['action' => 'register']); ?>">Registriere dich neu</a>
+        </div>
     <?php endif; ?>
     <?php echo $this->btFormRow($form->get('username')); ?>
     <?php echo $this->btFormRow($form->get('password')); ?>

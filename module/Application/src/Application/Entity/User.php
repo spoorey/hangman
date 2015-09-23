@@ -58,7 +58,7 @@ class User {
 
     /**
      * @var string
-     * @ORM\Column(type="string", nullable=false, name="role", unique=true);
+     * @ORM\Column(type="string", nullable=false, name="role");
      */
     protected $role = 'guest';
 
@@ -160,5 +160,21 @@ class User {
     public function setRole($role)
     {
         $this->role = $role;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPassword()
+    {
+        return $this->password;
+    }
+
+    /**
+     * @param string $password
+     */
+    public function setPassword($password)
+    {
+        $this->password = $password;
     }
 }

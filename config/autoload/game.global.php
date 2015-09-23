@@ -8,6 +8,7 @@
 
 return [
     'game' => [
+        'maximumGuesses' => 5,
         'allowedLetters' => [
             'A',
             'B',
@@ -19,7 +20,7 @@ return [
             'H',
             'I',
             'J',
-            'k',
+            'K',
             'L',
             'M',
             'N',
@@ -38,6 +39,7 @@ return [
             'Ä',
             'Ü',
             'Ö',
-        ]
+            ' ',
+        ],
     ]
 ];

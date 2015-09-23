@@ -18,9 +18,7 @@ return [
             ],
             [
                 'label'      => 'Spiel',
-                'route'      => 'application/default',
-                'action'     => 'index',
-                'controller' => 'game',
+                'route'      => 'application/game',
             ],
         ],
     ],

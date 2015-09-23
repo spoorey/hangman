@@ -12,8 +12,11 @@ namespace Application\Controller;
 use Application\Authentication\Adapter;
 use Application\Entity\User;
 use Application\Form\LoginForm;
+use Application\Form\UserForm;
+use Application\InputFilter\UserInputFilter;
 use DoctrineModule\Persistence\ObjectManagerAwareInterface;
 use DoctrineModule\Persistence\ProvidesObjectManager;
+use Zend\Crypt\Password\Bcrypt;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
 
@@ -65,11 +68,48 @@ class UserController extends AbstractActionController implements ObjectManagerAw
             }
         }
 
-
-
         return new ViewModel([
             'form'        => $form,
             'loginFailed' => $loginFailed,
+        ]);
+    }
+
+    public function registerAction() {
+        $request = $this->getRequest();
+        $form = new UserForm();
+        $emailConflict = false;
+        $userNameConflict = false;
+
+        if ($request->isPost()) {
+            $form->setData($request->getPost());
+            $form->setInputFilter(new UserInputFilter());
+            if ($form->isValid()) {
+                $data = $form->getData();
+
+                $userRepo = $this->getObjectManager()->getRepository(User::class);
+                $userNameConflict = ($userRepo->findOneBy(['userName' => $data['username']]) instanceof User);
+                if ($userNameConflict) {
+                    $form->get('username')->setValue('');
+                }
+
+                if (!$emailConflict && !$userNameConflict) {
+                    $user = new User();
+                    $user->setEmail($data['email']);
+                    $user->setUserName($data['username']);
+                    $bcrypt = new Bcrypt();
+                    $password = $bcrypt->create($data['password']);
+                    $user->setPassword($password);
+                    $this->getObjectManager()->persist($user);
+                    $this->getObjectManager()->flush();
+
+                    return $this->redirect()->toRoute('application/user', ['action' => 'login']);
+                }
+            }
+        }
+
+        return new ViewModel([
+            'form' => $form,
+            'userNameConflict' => $userNameConflict,
         ]);
     }
 } 

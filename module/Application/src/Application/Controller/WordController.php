@@ -16,6 +16,7 @@ use Application\InputFilter\WordInputFilter;
 use Doctrine\DBAL\Schema\View;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\Query;
 use DoctrineModule\Persistence\ObjectManagerAwareInterface;
 use DoctrineModule\Persistence\ProvidesObjectManager;
 use SebastianBergmann\Comparator\ExceptionComparatorTest;
@@ -33,10 +34,11 @@ class WordController extends AbstractActionController implements ObjectManagerAw
 
     public function indexAction()
     {
-        $dql = 'SELECT w FROM ' . Word::class . ' w ORDER BY w.word desc';
+        $dql = 'SELECT w FROM ' . Word::class . ' w ORDER BY w.word ASC';
 
         $itemsPerPage = 50;
 
+        /** @var Query $query */
         $query = $this->getObjectManager()->createQuery($dql);
         $adapter = new DoctrineAdapter(new ORMPaginator($query));
         $paginator = new Paginator($adapter);
@@ -89,7 +91,8 @@ class WordController extends AbstractActionController implements ObjectManagerAw
         $request = $this->getRequest();
         if ($request->isPost()) {
             $form->setData($request->getPost());
-            $form->setInputFilter(new WordInputFilter());
+            $config = $this->serviceLocator->get('Config');
+            $form->setInputFilter(new WordInputFilter($config['game']['allowedLetters']));
             if ($form->isValid()) {
                 $data = $form->getData();
                 $form->setData($data);
@@ -1088,7 +1091,8 @@ class WordController extends AbstractActionController implements ObjectManagerAw
         $conflict = false;
         if ($request->isPost()) {
             $form->setData($request->getPost());
-            $form->setInputFilter(new WordInputFilter());
+            $config = $this->serviceLocator->get('Config');
+            $form->setInputFilter(new WordInputFilter($config['game']['allowedLetters']));
             if ($form->isValid()) {
                 $data = $form->getData();
                 if ($this->getObjectManager()->getRepository(Word::class)->findOneBy(['word' => $data['word']]))  {

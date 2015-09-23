@@ -12,6 +12,7 @@ namespace Application;
 use Application\Controller\UserController;
 use Application\Entity\User;
 use Application\View\Helper\BootstrapFormRowHelper;
+use Application\View\Helper\IdentityHelper;
 use Zend\Authentication\AuthenticationService;
 use Zend\Db\Sql\Ddl\Column\Time;
 use Zend\ModuleManager\Feature\AutoloaderProviderInterface;
@@ -24,6 +25,7 @@ use Zend\Mvc\I18n\Translator;
 use Zend\I18n\Translator\Translator as I18nTranslator;
 use Zend\Mvc\Router\RouteMatch;
 use Zend\Validator\AbstractValidator;
+use Zend\View\HelperPluginManager;
 
 class Module implements AutoloaderProviderInterface, ConfigProviderInterface, ViewHelperProviderInterface
 {
@@ -77,7 +79,12 @@ class Module implements AutoloaderProviderInterface, ConfigProviderInterface, Vi
                 'btFormRow' => function() {
                     $helper = new BootstrapFormRowHelper();
                     return $helper;
-                }
+                },
+                'identity' => function($pluginManager) {
+                    /** @var HelperPluginManager $pluginManager*/
+                    $auth = $pluginManager->getServiceLocator()->get('auth');
+                    return new IdentityHelper($auth);
+                },
             ]
         ];
     }
@@ -86,7 +93,9 @@ class Module implements AutoloaderProviderInterface, ConfigProviderInterface, Vi
     public function protectPage(MvcEvent $event)
     {
         $match = $event->getRouteMatch();
-        if(!$match instanceof RouteMatch) {
+
+        $response = $event->getResponse();
+        if(!$match instanceof RouteMatch || $response instanceof \Zend\Console\Response) {
 
             return;
         }
@@ -98,6 +107,7 @@ class Module implements AutoloaderProviderInterface, ConfigProviderInterface, Vi
                 $controller == 'Application\Controller\Index'
                 || ($controller == 'Application\Controller\Word' && $action == 'index')
                 || ($controller == 'Application\Controller\User' && $action == 'login')
+                || ($controller == 'Application\Controller\User' && $action == 'register')
         )) {
             $serviceManager = $event->getApplication()->getServiceManager();
             /** @var AuthenticationService $auth */
@@ -106,7 +116,6 @@ class Module implements AutoloaderProviderInterface, ConfigProviderInterface, Vi
 
             // check if the user is logged in. For anything to do with words (except looking at them), the user must be an admin
             if (!$user instanceof User || ($user->getRole() != 'admin' && $controller == 'Application\Controller\Word' && $action != 'index')) {
-                $response = $event->getResponse();
                 $response->setStatusCode(401);
                 $match->setParam('controller', 'Application\Controller\User');
                 $match->setParam('action', 'login');

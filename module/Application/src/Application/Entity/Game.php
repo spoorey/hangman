@@ -125,6 +125,67 @@ class Game {
     }
 
     /**
+     * @return bool
+     */
+    public function allLettersGuessed(){
+        return $this->getWordLength() <= $this->getCorrectGuesses();
+    }
+
+    /**
+     * How many correct guesses were made
+     *
+     * @param bool $correctCharacters if true, the amount of characters that were guessed is returned
+     * (e.g. Word=FOOAA, "a" and "o" was guessed; returns 2 instead of 5 if correctCharacters == true)
+     * @return int
+     */
+    public function getCorrectGuesses($correctCharacters = false) {
+        $correctGuesses = 0;
+        foreach ($this->getGuessesAndPositions() as $guess) {
+            if ($correctCharacters) {
+                $correctGuesses ++;
+            } else {
+                $correctGuesses += count($guess['positions']);
+            }
+        }
+
+        return $correctGuesses;
+    }
+
+    public function getWrongGuessesAmount() {
+        $both = count($this->getGuessesAndPositions(true));
+        $correctGuesses = count($this->getGuessesAndPositions(false));
+
+        return $both - $correctGuesses;
+    }
+
+    public function getLettersAndPositon() {
+        $decodedWord = utf8_decode($this->word);
+
+        $letters = [];
+        for ($i = 0; $i < strlen($decodedWord); $i ++) {
+            $letter = $decodedWord[$i];
+            $strpos = strpos($decodedWord, $letter);
+            if (false !== $strpos) {
+                $positions = [];
+                $offset = 0;
+                do {
+                    $position = strpos($decodedWord, $letter, $offset);
+                    $offset = $position + 1;
+                    if (false !== $position) {
+                        $positions[] = $position;
+                    }
+                } while ($position !== false);
+                $letters[utf8_encode($letter)] = [
+                    'letter'    => utf8_encode($letter),
+                    'positions' => $positions,
+                ];
+            }
+        }
+
+        return array_values($letters);
+    }
+
+    /**
      * @return DateTime
      */
     public function getFinishedAt()

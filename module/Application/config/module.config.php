@@ -88,7 +88,7 @@ return [
                         'options' => [
                             'route'       => 'user[/:action]',
                             'constraints' => [
-                                'username' => '[a-zA-Z][a-zA-Z0-9_-]*',
+                                'action' => '[a-zA-Z][a-zA-Z0-9_-]*',
                             ],
                             'defaults'    => [
                                 'controller' => 'Application\Controller\User',
@@ -105,6 +105,19 @@ return [
                             ],
                             'defaults'    => [
                                 'controller' => 'Application\Controller\Game',
+                                'action'     => 'index',
+                            ],
+                        ],
+                    ],
+                    'word' => [
+                        'type'    => 'Segment',
+                        'options' => [
+                            'route'       => 'word[/:action][/:id]',
+                            'constraints' => [
+                                'username' => '[a-zA-Z][a-zA-Z0-9_-]*',
+                            ],
+                            'defaults'    => [
+                                'controller' => 'Application\Controller\Word',
                                 'action'     => 'index',
                             ],
                         ],

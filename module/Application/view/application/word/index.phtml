@@ -8,6 +8,15 @@ $pageCount = $this->pageCount;
 $currentPage = $this->currentPage;
 
 ?>
+<?php
+$isAdmin = ($this->identity() instanceof \Application\Entity\User && $this->identity()->getRole() == 'admin');
+?>
+
+<?php if ($isAdmin): ?>
+    <a href="<?php echo $this->url('application/word', ['action' => 'add']); ?>" class="btn btn-primary btn-lg">
+        <i class="fa fa-plus-circle"></i> Wort hinzufügen
+    </a>
+<?php endif; ?>
 <nav class="word-list">
     <ul class="pagination">
         <li <?php if ($currentPage <= 1): ?>class="disabled"<?php endif; ?>>
@@ -72,6 +81,7 @@ $currentPage = $this->currentPage;
                     </small>
                 </span>
 
+                <?php if ($isAdmin): ?>
                 <div class="links">
                     <div class="btn-group">
                         <a class="btn btn-primary btn-xs"
@@ -83,6 +93,7 @@ $currentPage = $this->currentPage;
                         </a>
                     </div>
                 </div>
+                <?php endif; ?>
             </div>
         </div>
     <?php endforeach; ?>
@@ -99,7 +110,7 @@ $currentPage = $this->currentPage;
                     echo $this->url('application/words', [], ['query' => ['p' => $currentPage - 1]]);
                 } ?>#"
                 aria-label="Previous"
-                >
+                >a
                 <span aria-hidden="true">&laquo;</span>
             </a>
         </li>
@@ -122,5 +133,11 @@ $currentPage = $this->currentPage;
         </li>
     </ul>
 </nav>
+
+<?php if ($isAdmin): ?>
+    <a href="<?php echo $this->url('application/word', ['action' => 'add']); ?>" class="btn btn-primary btn-lg">
+        <i class="fa fa-plus-circle"></i> Wort hinzufügen
+    </a>
+<?php endif; ?>
 <?php echo $this->headScript()
     ->prependFile($this->basePath('js/application/word.js'));
