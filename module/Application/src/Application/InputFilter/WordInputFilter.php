@@ -9,11 +9,12 @@
 namespace Application\InputFilter;
 
 
+use Zend\Filter\StringToUpper;
 use Zend\InputFilter\InputFilter;
 
 class WordInputFilter extends InputFilter
 {
-    function __construct()
+    function __construct(array $allowedLetters)
     {
         $this->add([
             'name'       => 'word',
@@ -21,6 +22,12 @@ class WordInputFilter extends InputFilter
             'filters'    => [
                 ['name' => 'StripTags'],
                 ['name' => 'StringTrim'],
+                [
+                    'name' => StringToUpper::class,
+                    'options' => [
+                        'encoding' => 'utf-8',
+                    ]
+                ],
             ],
             'validators' => [
                 [

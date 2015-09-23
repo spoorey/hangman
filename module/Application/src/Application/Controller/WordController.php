@@ -33,7 +33,7 @@ class WordController extends AbstractActionController implements ObjectManagerAw
 
     public function indexAction()
     {
-        $dql = 'SELECT w FROM ' . Word::class . ' w ORDER BY w.word';
+        $dql = 'SELECT w FROM ' . Word::class . ' w ORDER BY w.word desc';
 
         $itemsPerPage = 50;
 
@@ -50,8 +50,6 @@ class WordController extends AbstractActionController implements ObjectManagerAw
         }
 
         $pages = $paginator->getTotalItemCount() / $itemsPerPage;
-        $pageCount = $pages + 1;
-
 
         $paginator->setPageRange($pages);
 
@@ -94,7 +92,9 @@ class WordController extends AbstractActionController implements ObjectManagerAw
             $form->setInputFilter(new WordInputFilter());
             if ($form->isValid()) {
                 $data = $form->getData();
-                if ($this->getObjectManager()->getRepository(Word::class)->findOneBy(['word' => $data['word']]))  {
+                $form->setData($data);
+                $existingWord = $this->getObjectManager()->getRepository(Word::class)->findOneBy(['word' => $data['word']]);
+                if ($existingWord instanceof Word && $existingWord->getId() != $word->getId())  {
                     $conflict = true;
                 } else {
                     $word->setWord($data['word']);
@@ -107,7 +107,7 @@ class WordController extends AbstractActionController implements ObjectManagerAw
 
         $viewModel = new ViewModel([
             'form' => $form,
-            'con'
+            'conflict' => $conflict,
         ]);
 
         return $viewModel;

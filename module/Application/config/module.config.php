@@ -83,6 +83,32 @@ return [
                             ],
                         ],
                     ],
+                    'user' => [
+                        'type'    => 'Segment',
+                        'options' => [
+                            'route'       => 'user[/:action]',
+                            'constraints' => [
+                                'username' => '[a-zA-Z][a-zA-Z0-9_-]*',
+                            ],
+                            'defaults'    => [
+                                'controller' => 'Application\Controller\User',
+                                'action'     => 'login',
+                            ],
+                        ],
+                    ],
+                    'game' => [
+                        'type'    => 'Segment',
+                        'options' => [
+                            'route'       => 'game[/:action][/:id]',
+                            'constraints' => [
+                                'username' => '[a-zA-Z][a-zA-Z0-9_-]*',
+                            ],
+                            'defaults'    => [
+                                'controller' => 'Application\Controller\Game',
+                                'action'     => 'index',
+                            ],
+                        ],
+                    ],
                 ],
             ],
         ],
@@ -94,7 +120,11 @@ return [
         ],
         'factories'          => [
             'translator' => 'Zend\Mvc\Service\TranslatorServiceFactory',
+            'auth' 	     => 'Application\Service\Factory\AuthenticationFactory',
         ],
+        'invokables' => [
+            'auth-adapter' 	=> 'Application\Authentication\Adapter',
+        ]
     ],
     'translator'      => [
         'locale'                    => 'en_US',

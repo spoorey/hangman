@@ -81,6 +81,7 @@ $(document).ready(function () {
 
         if (!container.hasClass('down')) {
             container.addClass('down');
+            container.css('width', container.width());
 
             processAnimations(
                 slideUpAnimations,

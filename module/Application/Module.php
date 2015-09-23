@@ -9,7 +9,10 @@
 
 namespace Application;
 
+use Application\Controller\UserController;
+use Application\Entity\User;
 use Application\View\Helper\BootstrapFormRowHelper;
+use Zend\Authentication\AuthenticationService;
 use Zend\Db\Sql\Ddl\Column\Time;
 use Zend\ModuleManager\Feature\AutoloaderProviderInterface;
 use Zend\ModuleManager\Feature\ConfigProviderInterface;
@@ -19,6 +22,7 @@ use Zend\Mvc\MvcEvent;
 use Application\View\Helper\TimeAgoHelper;
 use Zend\Mvc\I18n\Translator;
 use Zend\I18n\Translator\Translator as I18nTranslator;
+use Zend\Mvc\Router\RouteMatch;
 use Zend\Validator\AbstractValidator;
 
 class Module implements AutoloaderProviderInterface, ConfigProviderInterface, ViewHelperProviderInterface
@@ -29,6 +33,7 @@ class Module implements AutoloaderProviderInterface, ConfigProviderInterface, Vi
         $moduleRouteListener = new ModuleRouteListener();
         $moduleRouteListener->attach($eventManager);
 
+        $eventManager->attach(MvcEvent::EVENT_ROUTE, [$this, 'protectPage'], -100);
 
         $t = new I18nTranslator();
         $t->setLocale('de_DE');
@@ -75,5 +80,38 @@ class Module implements AutoloaderProviderInterface, ConfigProviderInterface, Vi
                 }
             ]
         ];
+    }
+
+
+    public function protectPage(MvcEvent $event)
+    {
+        $match = $event->getRouteMatch();
+        if(!$match instanceof RouteMatch) {
+
+            return;
+        }
+        $controller = $match->getParam('controller');
+        $action     = $match->getParam('action');
+
+        // Do not protect index, word list and login
+        if (!(
+                $controller == 'Application\Controller\Index'
+                || ($controller == 'Application\Controller\Word' && $action == 'index')
+                || ($controller == 'Application\Controller\User' && $action == 'login')
+        )) {
+            $serviceManager = $event->getApplication()->getServiceManager();
+            /** @var AuthenticationService $auth */
+            $auth = $serviceManager->get('auth');
+            $user = $auth->getIdentity();
+
+            // check if the user is logged in. For anything to do with words (except looking at them), the user must be an admin
+            if (!$user instanceof User || ($user->getRole() != 'admin' && $controller == 'Application\Controller\Word' && $action != 'index')) {
+                $response = $event->getResponse();
+                $response->setStatusCode(401);
+                $match->setParam('controller', 'Application\Controller\User');
+                $match->setParam('action', 'login');
+
+            }
+        }
     }
 }

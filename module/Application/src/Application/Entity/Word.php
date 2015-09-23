@@ -64,14 +64,7 @@ class Word {
     }
 
     public function getFirstLetter() {
-        $i = 1;
-        do {
-            $firstLetter = substr($this->word, 0, $i);
-            $i ++;
-
-        } while (utf8_decode($firstLetter) == '?' && $firstLetter != '?');
-
-        return $firstLetter;
+        return mb_substr($this->word, 0, 1, 'utf-8');
     }
 
     /**
@@ -135,7 +128,7 @@ class Word {
      */
     public function setWord($word)
     {
-        $this->word = $word;
+        $this->word = self::getStringUpper($word);
     }
 
     /**
@@ -152,5 +145,21 @@ class Word {
     public function getGames()
     {
         return $this->games;
+    }
+
+    /**
+     * @param string $string
+     * @return string
+     */
+    static function getStringUpper($string) {
+        return mb_strtoupper($string, 'utf-8');
+    }
+
+    /**
+     * @param string $string
+     * @return string
+     */
+    static function getStringLength($string) {
+        return mb_strlen($string, 'utf-8');
     }
 }

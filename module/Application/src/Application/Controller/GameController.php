@@ -1,6 +1,4 @@
 <?php
-
-
 /**
  * Created by PhpStorm.
  * User: David Spörri
@@ -11,6 +9,7 @@ namespace Application\Controller;
 
 
 use Application\Entity\Word;
+use DateTime;
 use Doctrine\ORM\QueryBuilder;
 use DoctrineModule\Persistence\ObjectManagerAwareInterface;
 use DoctrineModule\Persistence\ProvidesObjectManager;
@@ -26,27 +25,31 @@ class GameController extends AbstractActionController implements ObjectManagerAw
     use ProvidesObjectManager;
 
     public function indexAction() {
+        $gameRepo = $this->getObjectManager()->getRepository(Game::class);
+        $container = new Container('game');
+        if (isset($container->gameId) && null != $container->gameId) {
+            $game = $gameRepo->find($container->gameId);
+            if ($game instanceof Game && $game->getFinishedAt() == null && $game->getUser()->getId() === $this->getUser()->getId()) {
+                return $this->redirect()->toRoute(
+                    'application/default',
+                    ['controller' => 'game', 'action' => 'play']
+                );
+            }
+        }
+
         $userRepo = $this->getObjectManager()->getRepository(User::class);
 
         $user = $userRepo->find(1);
-        $gameRepo = $this->getObjectManager()->getRepository(Game::class);
         $oldGames = $gameRepo->findBy(
             [
               'user'        => $user->getId(),
               'finishedAt'  => null,
             ],
             [
-                'finishedAt' => 'desc',
+                'startedAt' => 'asc',
             ],
             10
         );
-
-        /** @var QueryBuilder $qb */
-        $qb = $this->getObjectManager()->createQueryBuilder();
-        $qb->select('count(game.id)');
-        $qb->where('game.user = ?1')->andWhere('game.finishedAt IS NULL')->setParameter(1, $user->getId());
-        $qb->from(Game::class,'game');
-        $count = $qb->getQuery()->getSingleScalarResult();
 
         /*$game = new Game();
         $game->setUser($user);
@@ -56,7 +59,7 @@ class GameController extends AbstractActionController implements ObjectManagerAw
 
         return new ViewModel([
             'oldGames'  => $oldGames,
-            'gameCount' => $count
+            'gameCount' => count($oldGames)
         ]);
     }
 
@@ -81,7 +84,7 @@ class GameController extends AbstractActionController implements ObjectManagerAw
             $game->setWord($word->getWord());
         }
 
-        $game->setLastActionAt(new \DateTime());
+        $game->setLastActionAt(new DateTime());
         $this->getObjectManager()->persist($game);
         $this->getObjectManager()->flush();
 
@@ -123,7 +126,6 @@ class GameController extends AbstractActionController implements ObjectManagerAw
     }
 
     public function updateAction(){
-
         $container = new Container('game');
         if (!(isset($container->gameId) && null != $container->gameId)) {
             // no game stored in Session
@@ -140,14 +142,67 @@ class GameController extends AbstractActionController implements ObjectManagerAw
             return $this->getResponse()->setStatusCode(404);
         }
 
+        $request = $this->getRequest();
+        if ($request->isPost()) {
+            $data = $request->getPost();
+            if (isset($data['letter'])) {
+                $letter = (string) $data['letter'];
+                if(Word::getStringLength($letter) == 1) {
+                    $game->addGuessedLetter($letter);
+                    $this->getObjectManager()->persist($game);
+                    $this->getObjectManager()->flush();
+                }
+            }
+        }
+
+        $guessesAndPositions = $game->getGuessesAndPositions();
+        sort($guessesAndPositions);
         $variables = [
-            'letterCount'           => mb_strlen($game->getWord()),
-            'guessedLetters'        => $game->getGuessesAndPositions(),
+            'letterCount'           => $game->getWordLength(),
+            'guessedLetters'        => $guessesAndPositions,
         ];
 
         return new JsonModel($variables);
     }
 
+    /**
+     * @return \Zend\Http\Response
+     */
+    public function forfeitAction() {
+        $container = new Container('game');
+        if (!(isset($container->gameId) && null != $container->gameId)) {
+            // no game stored in Session
+            return $this->getResponse()->setStatusCode(404);
+        }
+
+        $gameRepo = $this->getObjectManager()->getRepository(Game::class);
+        $game = $gameRepo->findOneBy([
+            'id'   => $container->gameId,
+            'user' => $this->getUser()->getId(),
+        ]);
+
+        if (!$game instanceof Game) {
+            return $this->getResponse()->setStatusCode(404);
+        }
+
+        $game->setFinishedAt(new DateTime());
+        $this->getObjectManager()->persist($game);
+        $this->getObjectManager()->flush();
+        $container->getManager()->destroy();
+
+        return $this->redirect()->toRoute('application/default', ['controller' => 'game']);
+    }
+
+    public function pauseAction(){
+        $container = new Container('game');
+        if (!(isset($container->gameId) && null != $container->gameId)) {
+
+            return $this->getResponse()->setStatusCode(404);
+        }
+
+        $container->getManager()->destroy();
+        return $this->redirect()->toRoute('application/default', ['controller' => 'game']);
+    }
     /**
      * @return User
      */

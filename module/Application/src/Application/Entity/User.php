@@ -13,6 +13,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\HasLifecycleCallbacks;
 use Doctrine\ORM\Mapping\PrePersist;
+use Zend\Crypt\Password\Bcrypt;
 
 /**
  * This represents a user
@@ -49,12 +50,30 @@ class User {
      */
     protected $games;
 
+    /**
+     * @var string
+     * @ORM\Column(type="string", nullable=false, name="password", unique=true);
+     */
+    protected $password;
+
+    /**
+     * @var string
+     * @ORM\Column(type="string", nullable=false, name="role", unique=true);
+     */
+    protected $role = 'guest';
+
 
     /**
      * @var DateTime
      * @ORM\Column(type="datetime", nullable=false, name="registered_at");
      */
     protected $registeredAt;
+
+    public function verifyPassword($password) {
+        $bcrypt = new Bcrypt();
+
+        return $bcrypt->verify($password, $this->password);
+    }
 
     /**
      * @PrePersist
@@ -125,5 +144,21 @@ class User {
     public function addGame(Game $game) {
         $game->setUser($this);
         $this->games->add($game);
+    }
+
+    /**
+     * @return string
+     */
+    public function getRole()
+    {
+        return $this->role;
+    }
+
+    /**
+     * @param string $role
+     */
+    public function setRole($role)
+    {
+        $this->role = $role;
     }
 }

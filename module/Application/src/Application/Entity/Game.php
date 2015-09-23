@@ -12,6 +12,7 @@ use DateTime;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\HasLifecycleCallbacks;
 use Doctrine\ORM\Mapping\PrePersist;
+use Application\Entity\Word;
 
 /**
  * This represents a game
@@ -57,7 +58,7 @@ class Game {
 
     /**
      * @var string
-     * @ORM\Column(type="string", nullable=false, unique=true);
+     * @ORM\Column(type="string", nullable=false);
      */
     protected $word;
 
@@ -65,7 +66,13 @@ class Game {
      * @var array
      * @ORM\Column(type="array", nullable=false, name="guessed_letters");
      */
-    protected $guessedLetters;
+    protected $guessedLetters = [];
+
+    /**
+     * @var boolean
+     * @ORM\Column(type="boolean", nullable=false);
+     */
+    protected $won = false;
 
     /**
      * @PrePersist
@@ -80,14 +87,14 @@ class Game {
     }
 
     public function getWordLength() {
-        return strlen(utf8_decode($this->word));
+        return mb_strlen($this->word, 'utf-8');
     }
 
     public function getGuessesAndPositions($includeWrongGuesses = true) {
         $word = utf8_decode($this->word);
         $letters = [];
 
-        if (null != $this->guessedLetters || $includeWrongGuesses) {
+        if (null != $this->guessedLetters && is_array($this->guessedLetters)) {
             foreach ($this->guessedLetters as $guess) {
                 $guess = utf8_decode($guess);
                 $strpos = strpos($word, $guess);
@@ -210,6 +217,9 @@ class Game {
      */
     public function setGuessedLetters(array $guessedLetters)
     {
+        foreach ($guessedLetters as $i => $letter) {
+            $guessedLetters[$i] = Word::getStringUpper($letter);
+        }
         $this->guessedLetters = $guessedLetters;
     }
 
@@ -219,7 +229,7 @@ class Game {
     public function addGuessedLetter($letter)
     {
         if (!$this->letterWasGuessed($letter)) {
-            $this->guessedLetters[] = $letter;
+            $this->guessedLetters[] = Word::getStringUpper($letter);
         }
     }
 
@@ -229,7 +239,7 @@ class Game {
      */
     public function letterWasGuessed($letter)
     {
-        return in_array($letter, $this->guessedLetters);
+        return in_array(Word::getStringUpper($letter), $this->guessedLetters);
     }
 
     /**
@@ -245,6 +255,22 @@ class Game {
      */
     public function setWord($word)
     {
-        $this->word = $word;
+        $this->word = Word::getStringUpper($word);
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isWon()
+    {
+        return $this->won;
+    }
+
+    /**
+     * @param boolean $won
+     */
+    public function setWon($won)
+    {
+        $this->won = $won;
     }
 }
