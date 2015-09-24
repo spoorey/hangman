@@ -4,13 +4,22 @@ var allowedLettersContainer;
 var gameWonContainer;
 var gameLostContainer;
 var imageContainer;
+var guessInputContainer;
+var guessInput;
+var invalidLetterContainer;
+var remainingGuessesContainer;
+
 $(document).ready(function() {
     guessedLettersContainer = $('#guessed-letters');
     wrongLettersContainer = $('#wrong-letters');
     allowedLettersContainer = $('#allowed-letters');
     gameWonContainer = $('#game-won');
     gameLostContainer = $('#game-lost');
+    guessInputContainer = $('.guess-inputs');
     imageContainer = $('#image-container');
+    guessInput = guessInputContainer.find('#letter-input');
+    invalidLetterContainer = $('#invalid-letter');
+    remainingGuessesContainer = $('#remaining-guesses');
     updateGameInfo();
 });
 
@@ -23,6 +32,10 @@ function updateGameInfo() {
 }
 
 function guessLetter(letter) {
+    if (letter == '') {
+        return false;
+    }
+    guessInput.attr('disabled', 'disabled');
     guessedLettersContainer.html('<i class="fa fa-spinner fa-spin"></i>');
 
     $.post(
@@ -34,7 +47,6 @@ function guessLetter(letter) {
         processUpdateGameInfoResponse(data, a, response);
 
     });
-
 }
 
 function processUpdateGameInfoResponse(data, a, response) {
@@ -56,6 +68,7 @@ function processUpdateGameInfoResponse(data, a, response) {
     var leftGuesses = data.leftGuesses;
 
     $('#letter-count').text(letterCount);
+    invalidLetterContainer.hide();
 
     var letters = [];
     var blockedLetters = [];
@@ -75,6 +88,13 @@ function processUpdateGameInfoResponse(data, a, response) {
             });
         }
     );
+    if (leftGuesses <= 1) {
+        remainingGuessesContainer.text('Du darfst keinen falschen Buchstaben mehr raten!');
+        remainingGuessesContainer.addClass('alert alert-danger');
+    } else {
+        remainingGuessesContainer.text('Du darfst noch ' + (leftGuesses - 1) + ' falsche Buchstaben raten.');
+    }
+
 
     guessedLettersContainer.text('');
     for (var i = 0; i < letterCount; i ++) {
@@ -109,16 +129,35 @@ function processUpdateGameInfoResponse(data, a, response) {
     if (gameLost) {
         gameLostContainer.show();
         allowedLettersContainer.find('.letter').hide();
+        guessInputContainer.hide();
+        remainingGuessesContainer.hide();
 
         imageElement.animate({
             width: '400px'
         }, 2000);
         $('.game-abort').hide();
-    } if (gameWon) {
+    } else if (gameWon) {
         gameWonContainer.show();
+        guessInputContainer.hide();
         $('.game-abort').hide();
     }
 
     var imageSrc = '/img/hangman-' + leftGuesses + '.png';
     imageElement.attr('src', imageSrc);
+
+    guessInput.attr('disabled', null);
+    guessInput.val('');
+    guessInput.attr('disabled', null);
+    guessInput.focus();
+    guessInput.on('keyup', function() {
+        var guessedLetter = $(this).val().toUpperCase();
+        if (guessedLetter !== '') {
+            if ($.inArray(guessedLetter, allowedLetters) != -1) {
+                guessLetter(guessedLetter);
+            } else {
+                invalidLetterContainer.css('display', 'inline-block');
+            }
+        }
+        guessInput.val('');
+    });
 }

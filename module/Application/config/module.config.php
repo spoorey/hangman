@@ -55,20 +55,6 @@ return [
                             ],
                         ],
                     ],
-                    'user-details' => [
-                        'type'    => 'Segment',
-                        'options' => [
-                            'route'       => 'u/:username',
-                            'constraints' => [
-                                'username' => '[a-zA-Z][a-zA-Z0-9_-]*',
-                            ],
-                            'defaults'    => [
-                                'controller' => 'Application\Controller\User',
-                                'action'     => 'details',
-                            ],
-                        ],
-                    ],
-
                     'words' => [
                         'type'    => 'Segment',
                         'options' => [
@@ -86,7 +72,7 @@ return [
                     'user' => [
                         'type'    => 'Segment',
                         'options' => [
-                            'route'       => 'user[/:action]',
+                            'route'       => 'u[/:action]',
                             'constraints' => [
                                 'action' => '[a-zA-Z][a-zA-Z0-9_-]*',
                             ],
@@ -139,20 +125,9 @@ return [
             'auth-adapter' 	=> 'Application\Authentication\Adapter',
         ]
     ],
-    'translator'      => [
-        'locale'                    => 'en_US',
-        'translation_file_patterns' => [
-            [
-                'type'     => 'gettext',
-                'base_dir' => __DIR__ . '/../language',
-                'pattern'  => '%s.mo',
-            ],
-        ],
-    ],
     'controllers'     => [
         'invokables'   => [
             'Application\Controller\Index' => 'Application\Controller\IndexController',
-            'Application\Controller\Demo'  => 'Application\Controller\DemoController',
             'Application\Controller\User'  => 'Application\Controller\UserController',
             'Application\Controller\Word'  => 'Application\Controller\WordController',
             'Application\Controller\Game'  => 'Application\Controller\GameController',

@@ -154,12 +154,4 @@ class Word {
     static function getStringUpper($string) {
         return mb_strtoupper($string, 'utf-8');
     }
-
-    /**
-     * @param string $string
-     * @return string
-     */
-    static function getStringLength($string) {
-        return mb_strlen($string, 'utf-8');
-    }
 }

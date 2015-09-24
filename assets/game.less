@@ -9,6 +9,8 @@
 }
 
 .game-controls {
+    text-align: center;
+
     #guessed-letters {
         display: flex;
         font-size: 35px;
@@ -84,5 +86,32 @@
             width: 200px;
             background-color: #EBF7FF;
         }
+    }
+
+    .guess-inputs {
+        text-align: center;
+
+        #letter-input {
+            width: 35px;
+            height: 45px;
+            font-size: 30px;
+            text-transform: uppercase;
+            text-align: center;
+        }
+
+        .hide-input {
+            cursor: pointer;
+        }
+    }
+
+    #invalid-letter {
+        width: 50%;
+        display: none;
+    }
+
+    #remaining-guesses {
+        margin-bottom: 10px;
+        display: inline-block;
+        font-size: 18px;
     }
 }

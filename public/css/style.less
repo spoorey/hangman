@@ -3,14 +3,42 @@
 @import '../../assets/game';
 @import '../../assets/words';
 
-@black: #000;
-@white: #fff;
-@light-grey: #eee;
-@line-height: 14px;
-@word-margin: 10px;
-
 
 body {
     padding: 80px;
     margin-bottom: 0;
+}
+
+.navbar-user {
+    padding-right: 10px;
+    font-size: 18px;
+}
+
+.error-404 {
+    text-align: center;
+    background-color: @bg-404;
+    color: @color-404;
+    width: 50%;
+    margin: 0 auto;
+    padding: 60px 30px;
+    box-shadow: 0px 0px 20px 10px inset;
+    border-radius: 200px;
+    font-size: 20px;
+
+    .header-404 {
+        h1 {
+            font-size: 100px;
+            font-family: Tahoma, Arial, Helvetica, sans-serif;
+        }
+    }
+
+    .reason-404 {
+        color: darken(@bg-404, 10%);
+        background-color: darken(@color-404, 10%);
+        box-shadow: darken(@color-404, 10%) 0px 0px 16px 0px;
+        width: 80%;
+        margin: 0 auto;
+        border-radius: 10px;
+        padding: 10px;
+    }
 }

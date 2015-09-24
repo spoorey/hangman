@@ -16,8 +16,17 @@
     <div id="image-container">
         <img src="">
     </div>
+    <span id="remaining-guesses"></span>
     <div id="guessed-letters"></div>
     <div id="wrong-letters"></div>
+    <div class="guess-inputs">
+        <input id="letter-input" maxlength="1">
+        <span class="hide-input" onclick="$('.guess-inputs').hide();">&times;</span>
+    </div>
+    <div id="invalid-letter">
+        <br>
+        <div class="alert alert-warning">Dieses Zeichen kann nicht verwendet werden.</div>
+    </div>
     <div id="allowed-letters"></div>
     <a href="<?php echo $this->url('application/default', ['controller' => 'game', 'action' => 'pause']); ?>" class="game-abort btn btn-warning" id="pause-game"><i class="fa fa-pause"></i> Spiel unterbrechen</a>
     <a href="<?php echo $this->url('application/default', ['controller' => 'game', 'action' => 'forfeit']); ?>" class="game-abort btn btn-danger" id="pause-game"><i class="fa fa-flag"></i> Spiel aufgeben</a>

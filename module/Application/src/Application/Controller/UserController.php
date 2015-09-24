@@ -25,22 +25,6 @@ class UserController extends AbstractActionController implements ObjectManagerAw
 
     use ProvidesObjectManager;
 
-    public function detailsAction()
-    {
-        $userName = $this->params()->fromRoute('username');
-        $userRepo = $this->getObjectManager()->getRepository(User::class);
-        $user = $userRepo->findOneBy(['userName' => $userName]);
-        if (!$user instanceof User) {
-            $viewModel = new ViewModel();
-            $viewModel->setTemplate('error/404');
-            $viewModel->setVariable('reason', 'Es wurde kein User mit dem Namen "' . $userName . '" gefunden.');
-
-            return $viewModel;
-        }
-
-        echo $user->getUserName();
-    }
-
     public function logInAction()
     {
         $request = $this->getRequest();
@@ -112,4 +96,11 @@ class UserController extends AbstractActionController implements ObjectManagerAw
             'userNameConflict' => $userNameConflict,
         ]);
     }
-} 
+
+    public function logoutAction() {
+        $auth = $this->serviceLocator->get('auth');
+        $auth->clearIdentity();
+
+        return $this->redirect()->toRoute('home');
+    }
+}

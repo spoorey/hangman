@@ -1,4 +1,11 @@
-
+.word-search-form {
+    input, select, label {
+        margin-left: 10px;
+    }
+    div.form-group:nth-child(1) label {
+        margin-left: 0;
+    }
+}
 .word-list-container {
     display: flex;
     align-items: center;
@@ -77,34 +84,5 @@
         .modification-times {
             color: @active-color;
         }
-    }
-}
-
-.error-404 {
-    text-align: center;
-    background-color: @bg-404;
-    color: @color-404;
-    width: 50%;
-    margin: 0 auto;
-    padding: 60px 30px;
-    box-shadow: 0px 0px 20px 10px inset;
-    border-radius: 200px;
-    font-size: 20px;
-
-    .header-404 {
-        h1 {
-            font-size: 100px;
-            font-family: Tahoma, Arial, Helvetica, sans-serif;
-        }
-    }
-
-    .reason-404 {
-        color: darken(@bg-404, 10%);
-        background-color: darken(@color-404, 10%);
-        box-shadow: darken(@color-404, 10%) 0px 0px 16px 0px;
-        width: 80%;
-        margin: 0 auto;
-        border-radius: 10px;
-        padding: 10px;
     }
 }

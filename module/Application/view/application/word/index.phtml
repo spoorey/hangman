@@ -7,22 +7,48 @@ $words = $this->words;
 $pageCount = $this->pageCount;
 $currentPage = $this->currentPage;
 
-?>
-<?php
 $isAdmin = ($this->identity() instanceof \Application\Entity\User && $this->identity()->getRole() == 'admin');
+
+/** @var \Application\Form\WordSearchForm $form */
+$form = $this->form;
+
+$urlParameters = [];
+$orderBy = $this->orderBy;
+$direction = $this->direction;
+$query = $this->query;
+
+if ($orderBy != null) {
+    $urlParameters['o'] = $orderBy;
+}
+
+if ($direction != null) {
+    $urlParameters['d'] = $direction;
+}
+
+if ($query != null) {
+    $urlParameters['q'] = $query;
+}
 ?>
+<?php echo $this->form()->openTag($form); ?>
+<?php echo $this->btFormRow($form->get('q')); ?>
+<?php echo $this->btFormRow($form->get('o')); ?>
+<?php echo $this->btFormRow($form->get('d')); ?>
+<?php echo $this->btFormRow($form->get('submit')); ?>
+<?php echo $this->form()->closeTag(); ?>
 
 <?php if ($isAdmin): ?>
+    <br>
     <a href="<?php echo $this->url('application/word', ['action' => 'add']); ?>" class="btn btn-primary btn-lg">
         <i class="fa fa-plus-circle"></i> Wort hinzufügen
     </a>
 <?php endif; ?>
+
 <nav class="word-list">
     <ul class="pagination">
         <li <?php if ($currentPage <= 1): ?>class="disabled"<?php endif; ?>>
             <a
                 href="<?php if ($currentPage > 1) {
-                    echo $this->url('application/words', [], ['query' => ['p' => $currentPage - 1]]);
+                    echo $this->url('application/words', [], ['query' => array_merge(['p' => $currentPage - 1], $urlParameters)]);
                 } ?>#"
                 aria-label="Previous"
                 >
@@ -31,7 +57,7 @@ $isAdmin = ($this->identity() instanceof \Application\Entity\User && $this->iden
         </li>
         <?php for ($i = 1; $i <= $pageCount; $i++): ?>
             <li <?php if ($currentPage == $i): ?> class="active" <?php endif; ?>>
-                <a href="<?php echo $this->url('application/words', [], ['query' => ['p' => $i]]); ?>">
+                <a href="<?php echo $this->url('application/words', [], ['query' => array_merge(['p' => $i], $urlParameters)]); ?>">
                     <?php echo $i; ?>
                 </a>
             </li>
@@ -39,7 +65,7 @@ $isAdmin = ($this->identity() instanceof \Application\Entity\User && $this->iden
         <li <?php if ($currentPage >= $pageCount): ?>class="disabled"<?php endif; ?>>
             <a
                 href="<?php if ($currentPage < $pageCount) {
-                    echo $this->url('application/words', [], ['query' => ['p' => $currentPage + 1]]);
+                    echo $this->url('application/words', [], ['query' => array_merge(['p' => $currentPage + 1], $urlParameters)]);
                 } ?>#"
                 aria-label="Next"
                 >
@@ -57,10 +83,12 @@ $isAdmin = ($this->identity() instanceof \Application\Entity\User && $this->iden
         $letters[$firstLetter][] = $word;
     }
     foreach ($letters as $firstLetter => $words):
+        if ($this->orderBy == 'word'):
         ?>
         <div class="subtitle bg-primary">
             <?php echo $firstLetter; ?>
         </div>
+        <?php endif; ?>
         <?php foreach ($words as $word): ?>
         <div class="entry">
             <div class="word">
@@ -107,16 +135,16 @@ $isAdmin = ($this->identity() instanceof \Application\Entity\User && $this->iden
         <li <?php if ($currentPage <= 1): ?>class="disabled"<?php endif; ?>>
             <a
                 href="<?php if ($currentPage > 1) {
-                    echo $this->url('application/words', [], ['query' => ['p' => $currentPage - 1]]);
+                    echo $this->url('application/words', [], ['query' => array_merge(['p' => $currentPage - 1], $urlParameters)]);
                 } ?>#"
                 aria-label="Previous"
-                >a
+                >
                 <span aria-hidden="true">&laquo;</span>
             </a>
         </li>
         <?php for ($i = 1; $i <= $pageCount; $i++): ?>
             <li <?php if ($currentPage == $i): ?> class="active" <?php endif; ?>>
-                <a href="<?php echo $this->url('application/words', [], ['query' => ['p' => $i]]); ?>">
+                <a href="<?php echo $this->url('application/words', [], ['query' => array_merge(['p' => $i], $urlParameters)]); ?>">
                     <?php echo $i; ?>
                 </a>
             </li>
@@ -124,7 +152,7 @@ $isAdmin = ($this->identity() instanceof \Application\Entity\User && $this->iden
         <li <?php if ($currentPage >= $pageCount): ?>class="disabled"<?php endif; ?>>
             <a
                 href="<?php if ($currentPage < $pageCount) {
-                    echo $this->url('application/words', [], ['query' => ['p' => $currentPage + 1]]);
+                    echo $this->url('application/words', [], ['query' => array_merge(['p' => $currentPage + 1], $urlParameters)]);
                 } ?>#"
                 aria-label="Next"
                 >

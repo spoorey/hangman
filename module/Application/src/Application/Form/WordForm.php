@@ -30,8 +30,7 @@ class WordForm extends Form
             ],
         ]);
 
-
-        $this->add([
+       $this->add([
             'name'       => 'submit',
             'type'       => 'Submit',
             'attributes' => [

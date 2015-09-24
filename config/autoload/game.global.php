@@ -8,7 +8,7 @@
 
 return [
     'game' => [
-        'maximumGuesses' => 5,
+        'gameOverAfter' => 7,
         'allowedLetters' => [
             'A',
             'B',

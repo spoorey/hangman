@@ -139,16 +139,19 @@ class Game {
      * @return int
      */
     public function getCorrectGuesses($correctCharacters = false) {
-        $correctGuesses = 0;
-        foreach ($this->getGuessesAndPositions() as $guess) {
-            if ($correctCharacters) {
-                $correctGuesses ++;
-            } else {
-                $correctGuesses += count($guess['positions']);
-            }
-        }
+        $guessesAndPositions = $this->getGuessesAndPositions();
 
-        return $correctGuesses;
+        if ($correctCharacters) {
+            return count($guessesAndPositions);
+        } else {
+            $correctGuesses = 0;
+            foreach ($guessesAndPositions as $guess) {
+                $correctGuesses += count($guess['positions']);
+
+            }
+
+            return $correctGuesses;
+        }
     }
 
     public function getWrongGuessesAmount() {

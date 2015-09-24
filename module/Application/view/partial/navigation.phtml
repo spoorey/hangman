@@ -69,3 +69,18 @@ $container = $this->container;
         <?php endif ?>
     <?php endforeach ?>
 </ul>
+
+<?php if ($this->identity() instanceof \Application\Entity\User): ?>
+    <div class="navbar-right navbar-user">
+        <ul class="<?php echo $this->navigation($container)->menu()->getUlClass(); ?> navbar-right">
+            <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                    <i class="fa fa-user"></i> <?php echo $this->identity()->getUserName(); ?> <span class="caret"></span>
+                </a>
+                <ul class="dropdown-menu">
+                    <li><a href="<?php echo $this->url('application/user', ['action' => 'logout']); ?>"><i class="fa fa-power-off"></i> Logout</a></li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+<?php endif; ?>

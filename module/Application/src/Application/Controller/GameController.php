@@ -10,7 +10,6 @@ namespace Application\Controller;
 
 use Application\Entity\Word;
 use DateTime;
-use Doctrine\ORM\QueryBuilder;
 use DoctrineModule\Persistence\ObjectManagerAwareInterface;
 use DoctrineModule\Persistence\ProvidesObjectManager;
 use Zend\Mvc\Controller\AbstractActionController;
@@ -48,12 +47,6 @@ class GameController extends AbstractActionController implements ObjectManagerAw
             ],
             10
         );
-
-        /*$game = new Game();
-        $game->setUser($user);
-        $game->setWord($word);
-        $this->getObjectManager()->persist($game);
-        $this->getObjectManager()->flush();*/
 
         return new ViewModel([
             'oldGames'  => $oldGames,
@@ -157,21 +150,27 @@ class GameController extends AbstractActionController implements ObjectManagerAw
             $correctGuesses += count($guess['positions']);
         }
         $gameWon =  ($correctGuesses >= $game->getWordLength());
+        $config = $this->serviceLocator->get('Config');
+
+        $invalidLetter = false;
         // if this game is won, do not update it
         if (!$gameWon) {
             $request = $this->getRequest();
             if ($request->isPost()) {
                 $data = $request->getPost();
                 if (isset($data['letter'])) {
-                    $letter = (string) $data['letter'];
-                    if(Word::getStringLength($letter) == 1) {
-                        $game->addGuessedLetter($letter);
+                    $letter = Word::getStringUpper((string) $data['letter']);
+                    if (in_array($letter, $config['game']['allowedLetters'])) {
+                        if(mb_strlen($letter, 'utf-8') == 1) {
+                            $game->addGuessedLetter($letter);
+                        }
+                    } else {
+                        $invalidLetter = true;
                     }
                 }
             }
         }
 
-        $config = $this->serviceLocator->get('Config');
         $allowedLetters = $config['game']['allowedLetters'];
         $correctGuesses = 0;
         $guessesAndPositions = $game->getGuessesAndPositions();
@@ -189,7 +188,7 @@ class GameController extends AbstractActionController implements ObjectManagerAw
         }
 
         $wrongGuesses = $game->getWrongGuessesAmount();
-        $leftGuesses = $config['game']['maximumGuesses'] - $wrongGuesses;
+        $leftGuesses = $config['game']['gameOverAfter'] - $wrongGuesses;
 
         $gameLost = $leftGuesses <= 0;
         if ($gameLost) {
@@ -205,7 +204,6 @@ class GameController extends AbstractActionController implements ObjectManagerAw
         $this->getObjectManager()->persist($game);
         $this->getObjectManager()->flush();
 
-        sort($guessesAndPositions);
         $variables = [
             'letterCount'           => $game->getWordLength(),
             'guessedLetters'        => $guessesAndPositions,
@@ -213,6 +211,7 @@ class GameController extends AbstractActionController implements ObjectManagerAw
             'gameWon'               => $gameWon,
             'leftGuesses'           => $leftGuesses,
             'gameLost'              => $gameLost,
+            'invalidLetter'         => $invalidLetter,
         ];
 
         return new JsonModel($variables);
