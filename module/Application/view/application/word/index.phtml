@@ -116,7 +116,7 @@ if ($query != null) {
                            href="<?php echo $this->url('application/words', ['action' => 'edit', 'id' => $word->getId(),], []); ?>">
                             <i class="fa fa-edit"></i> Bearbeiten
                         </a>
-                        <a class="btn btn-danger btn-xs">
+                        <a class="btn btn-danger btn-xs" href="<?php echo $this->url('application/word', ['action' => 'delete', 'id' => $word->getId(),], []); ?>">
                             <i class="fa fa-trash-o"></i> Löschen
                         </a>
                     </div>

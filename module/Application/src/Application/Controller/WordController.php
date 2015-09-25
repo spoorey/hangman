@@ -145,6 +145,25 @@ class WordController extends AbstractActionController implements ObjectManagerAw
         return $viewModel;
     }
 
+    public function deleteAction()
+    {
+        $id = $this->params()->fromRoute('id');
+        $objectManager = $this->getObjectManager();
+        $wordRepo = $objectManager->getRepository(Word::class);
+        $word = $wordRepo->find((int) $id);
+        if (!$word instanceof Word) {
+            $viewModel = new ViewModel();
+            $viewModel->setTemplate('error/404');
+            $viewModel->setVariable('reason', 'Dieses Wort konnte nicht gefunden werden.');
+
+            return $viewModel;
+        }
+
+        $objectManager->remove($word);
+        $objectManager->flush();
+
+        return $this->redirect()->toRoute('application/words');
+    }
     public function addAction(){
         $form = new WordForm();
 
