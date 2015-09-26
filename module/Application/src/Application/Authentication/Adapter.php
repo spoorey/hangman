@@ -21,7 +21,6 @@ class Adapter extends AbstractAdapter implements ServiceLocatorAwareInterface
     public function authenticate()
     {
         $entityManager = $this->serviceLocator->get(EntityManager::class);
-        // We ask the Doctrine 2 entity manager to find a user with the specified email
         $user = $entityManager->getRepository(User::class)->findOneBy(['userName' => $this->identity]);
 
         if ($user instanceof User && $user->verifyPassword($this->credential)) {

@@ -11,17 +11,7 @@ $(document).ready(function () {
                 height: word.css('height'),
                 fontSize: word.css('font-size')
             },
-
-            forceNoChange: [
-            ],
             selector: ' .word'
-        },
-        {
-            animation: {
-            },
-            forceNoChange: [
-            ],
-            selector: null
         }
     ];
 
@@ -31,16 +21,7 @@ $(document).ready(function () {
                 height: 14,
                 fontSize: 14
             },
-            forceNoChange: [
-            ],
             selector: ' .word'
-        },
-        {
-            animation: {
-            },
-            forceNoChange: [
-            ],
-            selector: null
         }
     ];
 
@@ -56,6 +37,7 @@ $(document).ready(function () {
         }
     );
 
+    // moving the cursor out of the list element
     function moveOutAnimation(container) {
         var subject = container.find(slideSubjectSelector);
         var _this = container;
@@ -76,11 +58,13 @@ $(document).ready(function () {
         });
     }
 
+    // moving the cursor into the word list element
     function moveInAnimation(container) {
         var subject = container.find(slideSubjectSelector);
 
         if (!container.hasClass('down')) {
             container.addClass('down');
+            // do not change the width
             container.css('width', container.width());
 
             processAnimations(
@@ -96,8 +80,6 @@ $(document).ready(function () {
 
 function processAnimations(animations, duration, container) {
     animations.forEach(function (animation) {
-        var beforeValues = [];
-
         var animationSubject;
         if (animation.selector === null) {
             animationSubject = container;
@@ -105,31 +87,6 @@ function processAnimations(animations, duration, container) {
             animationSubject = container.find(animation.selector);
         }
 
-        animation.forceNoChange.forEach(function (attribute) {
-            var cssValue = animationSubject.css(attribute);
-
-
-            if (cssValue != null) {
-                beforeValues[attribute] = cssValue;
-                console.log(attribute, cssValue);
-            } else {
-                beforeValues[attribute] = animationSubject.attr(attribute);
-            }
-        });
-
         animationSubject.animate(animation.animation, duration);
-
-        animation.forceNoChange.forEach(function (attribute) {
-            if (attribute == 'width') {
-                animationSubject.css('width', beforeValues['width']);
-                return;
-            }
-
-
-
-            animationSubject.attr(attribute, beforeValues[attribute]);
-            animationSubject.css(attribute, beforeValues[attribute]);
-        });
-
     });
 }

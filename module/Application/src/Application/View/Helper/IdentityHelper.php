@@ -25,6 +25,11 @@ class IdentityHelper extends AbstractHelper
         $this->authService = $authService;
     }
 
+    /**
+     * Returns the currently logged in user
+     *
+     * @return User|null
+     */
     public function __invoke(){
         return $this->authService->getIdentity();
     }

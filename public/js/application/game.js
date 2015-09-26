@@ -10,6 +10,7 @@ var invalidLetterContainer;
 var remainingGuessesContainer;
 
 $(document).ready(function() {
+    // fill out all the variables
     guessedLettersContainer = $('#guessed-letters');
     wrongLettersContainer = $('#wrong-letters');
     allowedLettersContainer = $('#allowed-letters');
@@ -20,17 +21,24 @@ $(document).ready(function() {
     guessInput = guessInputContainer.find('#letter-input');
     invalidLetterContainer = $('#invalid-letter');
     remainingGuessesContainer = $('#remaining-guesses');
+    // fetch the game's status
     updateGameInfo();
 });
 
 function updateGameInfo() {
     guessedLettersContainer.html('<i class="fa fa-spinner fa-spin"></i>');
     $.get('update', function(data, a, response) {
-        processUpdateGameInfoResponse(data, a, response);
+        processUpdateGameInfoResponse(data, response);
 
     });
 }
 
+/**
+ * Send a request to guess the given letter
+ *
+ * @param letter
+ * @returns {boolean}
+ */
 function guessLetter(letter) {
     if (letter == '') {
         return false;
@@ -44,13 +52,21 @@ function guessLetter(letter) {
             'letter': letter
         },
         function(data, a, response) {
-        processUpdateGameInfoResponse(data, a, response);
+        processUpdateGameInfoResponse(data, response);
 
     });
 }
 
-function processUpdateGameInfoResponse(data, a, response) {
+/**
+ * Process the response of the second tier
+ *
+ * @param data
+ * @param response
+ * @returns {boolean}
+ */
+function processUpdateGameInfoResponse(data, response) {
 
+    // something went horribly wrong
     if (response.status != 200) {
         alert('Fehler: Konnte Spieldaten nicht laden.')
         console.error('Could not load data');
@@ -73,6 +89,8 @@ function processUpdateGameInfoResponse(data, a, response) {
     var letters = [];
     var blockedLetters = [];
     wrongLettersContainer.text('');
+
+    // display wrong letters and prepare the array with the correct letters
     guessedLetters.forEach(
         function (letter) {
             blockedLetters.push(letter.letter);
@@ -88,6 +106,8 @@ function processUpdateGameInfoResponse(data, a, response) {
             });
         }
     );
+
+    // display how many wrong guesses are left
     if (leftGuesses <= 1) {
         remainingGuessesContainer.text('Du darfst keinen falschen Buchstaben mehr raten!');
         remainingGuessesContainer.addClass('alert alert-danger');
@@ -95,7 +115,7 @@ function processUpdateGameInfoResponse(data, a, response) {
         remainingGuessesContainer.text('Du darfst noch ' + (leftGuesses - 1) + ' falsche Buchstaben raten.');
     }
 
-
+    // display the correctly guessed letters (and emtpy elements for the not-yet-guessed ones
     guessedLettersContainer.text('');
     for (var i = 0; i < letterCount; i ++) {
         if (typeof (letters[i]) === 'undefined') {
@@ -127,24 +147,29 @@ function processUpdateGameInfoResponse(data, a, response) {
     var imageElement = imageContainer.find('img');
 
     if (gameLost) {
+        // show game lost info and hide elements that are no longer needed
         gameLostContainer.show();
         allowedLettersContainer.find('.letter').hide();
         guessInputContainer.hide();
         remainingGuessesContainer.hide();
 
+        // animate the image to a bigger size
         imageElement.animate({
             width: '400px'
         }, 2000);
         $('.game-abort').hide();
     } else if (gameWon) {
+        // game is won, show/hide stuff accordingly
         gameWonContainer.show();
         guessInputContainer.hide();
         $('.game-abort').hide();
     }
 
+    // get the correct image, according to the left guesses
     var imageSrc = '/img/hangman-' + leftGuesses + '.png';
     imageElement.attr('src', imageSrc);
 
+    // re-enable the guess input, and bind it's event
     guessInput.attr('disabled', null);
     guessInput.val('');
     guessInput.attr('disabled', null);

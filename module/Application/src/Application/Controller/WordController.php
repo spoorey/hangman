@@ -33,7 +33,6 @@ class WordController extends AbstractActionController implements ObjectManagerAw
 
     public function indexAction()
     {
-
         /** @var QueryBuilder $qb */
         $qb = $this->getObjectManager()->createQueryBuilder();
         $qb->select('w')
@@ -42,8 +41,10 @@ class WordController extends AbstractActionController implements ObjectManagerAw
         $form = new WordSearchForm();
         $form->setData($this->params()->fromQuery());
         $form->setInputFilter(new WordSearchInputFilter());
+        // it doesn't matter if the form is not valid, as we would fill in default values anyway. This is just to avoid the default error messages
         $form->isValid();
 
+        // set query, direction and order for the querybuilder
         $direction = strtolower($form->getData()['d']);
         $direction = ($direction == 'desc' ? 'desc' : 'asc');
 
@@ -68,6 +69,7 @@ class WordController extends AbstractActionController implements ObjectManagerAw
 
         $itemsPerPage = 50;
 
+        // set up the paginator
         $adapter = new DoctrineAdapter(new ORMPaginator($qb->getQuery()));
         $paginator = new Paginator($adapter);
         $paginator->setDefaultItemCountPerPage(50);
@@ -98,6 +100,11 @@ class WordController extends AbstractActionController implements ObjectManagerAw
         return $viewModel;
     }
 
+    /**
+     * Allows editing of words.
+     *
+     * @return ViewModel
+     */
     public function editAction()
     {
         $id = $this->params()->fromRoute('id');
@@ -145,6 +152,11 @@ class WordController extends AbstractActionController implements ObjectManagerAw
         return $viewModel;
     }
 
+    /**
+     * Allows deleting a word
+     *
+     * @return \Zend\Http\Response|ViewModel
+     */
     public function deleteAction()
     {
         $id = $this->params()->fromRoute('id');

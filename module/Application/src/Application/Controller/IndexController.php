@@ -22,6 +22,7 @@ class IndexController extends AbstractActionController implements ObjectManagerA
     public function indexAction()
     {
         $viewModel = new ViewModel();
+        // just check if the user is logged in...
         $auth = $this->getServiceLocator()->get('auth');
         if ($auth->hasIdentity()) {
             $viewModel->setTemplate('application/index/index');

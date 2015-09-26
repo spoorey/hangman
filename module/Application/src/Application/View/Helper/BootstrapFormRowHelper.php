@@ -13,8 +13,13 @@ use Zend\Form\ElementInterface;
 use Zend\Form\View\Helper\FormRow;
 
 class BootstrapFormRowHelper extends FormRow{
-
-
+    /**
+     * Renders the form row as a bootstrap form row
+     *
+     * @param ElementInterface $element
+     * @param null $labelPosition
+     * @return string
+     */
     public function render(ElementInterface $element, $labelPosition = null)
     {
 

@@ -135,7 +135,7 @@ return [
         'initializers' => [
             'ObjectManagerInitializer' => function ($controller, $controllerManager) {
                 /** @var ControllerManager $controllerManager */
-                // look if the form implements the ObjectManagerAwareInterface
+                // look if the controller implements the ObjectManagerAwareInterface
                 if ($controller instanceof ObjectManagerAwareInterface) {
                     // locate the EntityManager using the serviceLocator
 

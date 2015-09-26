@@ -13,6 +13,12 @@ use DateTime;
 use Zend\Form\View\Helper\AbstractHelper;
 
 class TimeAgoHelper extends AbstractHelper {
+    /**
+     * Converts time intervals to strings ("XY hours ago")
+     *
+     * @param DateTime $dateTime
+     * @return string
+     */
     public function __invoke(DateTime $dateTime)
     {
         $dateDiff = $dateTime->diff(new DateTime());

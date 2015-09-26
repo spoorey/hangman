@@ -90,6 +90,12 @@ class Game {
         return mb_strlen($this->word, 'utf-8');
     }
 
+    /**
+     * Gets all guesses and their positions in the word
+     *
+     * @param bool $includeWrongGuesses
+     * @return array
+     */
     public function getGuessesAndPositions($includeWrongGuesses = true) {
         $word = utf8_decode($this->word);
         $letters = [];
@@ -161,6 +167,11 @@ class Game {
         return $both - $correctGuesses;
     }
 
+    /**
+     * similar to @see getGuessesAndPositions but includes all letters. ONLY use this if the game is over.
+     *
+     * @return array
+     */
     public function getLettersAndPositon() {
         $decodedWord = utf8_decode($this->word);
 

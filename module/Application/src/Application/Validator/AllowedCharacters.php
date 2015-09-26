@@ -10,6 +10,12 @@ use Zend\Validator\AbstractValidator;
  * Time: 09:42
  */
 
+/**
+ * Class AllowedCharacters
+ * Makes sure only a certain set of characters were used.
+ *
+ * @package Application\Validator
+ */
 class AllowedCharacters extends AbstractValidator {
 
     protected $messageTemplates = [

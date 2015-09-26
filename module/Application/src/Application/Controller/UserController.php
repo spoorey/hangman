@@ -32,6 +32,7 @@ class UserController extends AbstractActionController implements ObjectManagerAw
         $loginFailed = false;
 
         if ($request->isPost()) {
+            // Check if the form and provided values are valid, and redirect if so
             $form->setData($request->getPost());
             if ($form->isValid()) {
                 $data = $form->getData();
@@ -44,7 +45,6 @@ class UserController extends AbstractActionController implements ObjectManagerAw
                 $authAdapter->setCredential($data['password']);
                 $result = $auth->authenticate();
                 if($result->isValid()) {
-                    $user = $result->getIdentity();
                     return $this->redirect()->toRoute('application/game');
                 } else {
                     $loginFailed = true;
@@ -61,10 +61,10 @@ class UserController extends AbstractActionController implements ObjectManagerAw
     public function registerAction() {
         $request = $this->getRequest();
         $form = new UserForm();
-        $emailConflict = false;
         $userNameConflict = false;
 
         if ($request->isPost()) {
+            // check if the form is valid
             $form->setData($request->getPost());
             $form->setInputFilter(new UserInputFilter());
             if ($form->isValid()) {
@@ -72,11 +72,11 @@ class UserController extends AbstractActionController implements ObjectManagerAw
 
                 $userRepo = $this->getObjectManager()->getRepository(User::class);
                 $userNameConflict = ($userRepo->findOneBy(['userName' => $data['username']]) instanceof User);
+
                 if ($userNameConflict) {
                     $form->get('username')->setValue('');
-                }
-
-                if (!$emailConflict && !$userNameConflict) {
+                } else {
+                    // if the requested username is not taken yet, create the password and redirect the user to the login
                     $user = new User();
                     $user->setEmail($data['email']);
                     $user->setUserName($data['username']);

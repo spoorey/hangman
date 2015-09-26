@@ -27,6 +27,8 @@ class GameController extends AbstractActionController implements ObjectManagerAw
         $user = $this->getUser();
         $gameRepo = $this->getObjectManager()->getRepository(Game::class);
         $container = new Container('game');
+
+        // if there is a game running, redirect to it
         if (isset($container->gameId) && null != $container->gameId) {
             $game = $gameRepo->find($container->gameId);
             if ($game instanceof Game && $game->getFinishedAt() == null && $game->getUser()->getId() === $user->getId()) {
@@ -37,6 +39,7 @@ class GameController extends AbstractActionController implements ObjectManagerAw
             }
         }
 
+        // otherwise, fetch the unfinished games
         $oldGames = $gameRepo->findBy(
             [
               'user'        => $user->getId(),
@@ -54,16 +57,15 @@ class GameController extends AbstractActionController implements ObjectManagerAw
         ]);
     }
 
+    /**
+     * Start a new or existing game and redirect to it.
+     *
+     * @return \Zend\Http\Response
+     */
     public function startAction() {
         $id = (int) $this->params()->fromRoute('id');
         $gameRepo = $this->getObjectManager()->getRepository(Game::class);
-
         $user = $this->getUser();
-        $startedGames = $gameRepo->findBy([
-            'user' => $user->getId(),
-            'finishedAt' => null,
-        ]);
-
 
         $game = null;
         if (null != $id) {
@@ -88,6 +90,7 @@ class GameController extends AbstractActionController implements ObjectManagerAw
         $this->getObjectManager()->persist($game);
         $this->getObjectManager()->flush();
 
+        // put the game's id into the session
         $container = new Container('game');
         $container->gameId = $game->getId();
 
@@ -97,6 +100,11 @@ class GameController extends AbstractActionController implements ObjectManagerAw
         );
     }
 
+    /**
+     * Prepare the view for playing a game. Data provided by @see updateAction
+     *
+     * @return \Zend\Http\Response|ViewModel
+     */
     public function playAction()
     {
         $container = new Container('game');
@@ -126,8 +134,14 @@ class GameController extends AbstractActionController implements ObjectManagerAw
         return new ViewModel();
     }
 
+    /**
+     * This handles the AJAX requests to update a game
+     *
+     * @return JsonModel
+     */
     public function updateAction(){
         $container = new Container('game');
+        // if there is no game running, return a 404 error
         if (!(isset($container->gameId) && null != $container->gameId)) {
             // no game stored in Session
             return $this->getResponse()->setStatusCode(404);
@@ -158,6 +172,7 @@ class GameController extends AbstractActionController implements ObjectManagerAw
             $request = $this->getRequest();
             if ($request->isPost()) {
                 $data = $request->getPost();
+                // validate the guess and add it to the game
                 if (isset($data['letter'])) {
                     $letter = Word::getStringUpper((string) $data['letter']);
                     if (in_array($letter, $config['game']['allowedLetters'])) {
@@ -179,6 +194,7 @@ class GameController extends AbstractActionController implements ObjectManagerAw
             $correctGuesses += count($guess['positions']);
         }
 
+        // check if the game was won, and update it if so
         $gameWon =  ($correctGuesses >= $game->getWordLength());
         if ($gameWon) {
             $container = new Container('game');
@@ -190,6 +206,7 @@ class GameController extends AbstractActionController implements ObjectManagerAw
         $wrongGuesses = $game->getWrongGuessesAmount();
         $leftGuesses = $config['game']['gameOverAfter'] - $wrongGuesses;
 
+        // check if the game was lost and update it if so
         $gameLost = $leftGuesses <= 0;
         if ($gameLost) {
             $container = new Container('game');
@@ -218,6 +235,8 @@ class GameController extends AbstractActionController implements ObjectManagerAw
     }
 
     /**
+     * When the user wants to forfeit (surrender) a game
+     *
      * @return \Zend\Http\Response
      */
     public function forfeitAction() {
@@ -247,6 +266,11 @@ class GameController extends AbstractActionController implements ObjectManagerAw
         return $this->redirect()->toRoute('application/default', ['controller' => 'game']);
     }
 
+    /**
+     * When the user wants to pause a game to restart it at a later point in time
+     *
+     * @return \Zend\Http\Response
+     */
     public function pauseAction(){
         $container = new Container('game');
         if (!(isset($container->gameId) && null != $container->gameId)) {
