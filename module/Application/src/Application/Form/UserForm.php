@@ -33,7 +33,7 @@ class UserForm extends Form
             'name'       => 'email',
             'type'       => 'Email',
             'options'    => [
-                'label'    => 'E-Mail',
+                'label'    => 'E-Mail (freiwillig)',
             ],
             'attributes' => [
                 'id'       => 'email',
